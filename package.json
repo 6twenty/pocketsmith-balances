@@ -18,5 +18,9 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2"
+  },
+  "dependencies": {
+    "got": "^6.7.1",
+    "menubar": "^5.2.3"
   }
 }

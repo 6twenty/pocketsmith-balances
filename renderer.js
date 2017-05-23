@@ -3,8 +3,8 @@ const {ipcRenderer, shell} = require('electron')
 const accounting = require('accounting-js')
 const moment = require('moment')
 
-const log = message => {
-  ipcRenderer.send('log', message)
+const log = (...args) => {
+  ipcRenderer.send('log', ...args)
 }
 
 const get = endpoint => {
@@ -25,14 +25,13 @@ const get = endpoint => {
 }
 
 const renderAccounts = (user, accounts) => {
-  const main = document.querySelector('main')
-  const content = main.querySelector('.content')
+  const section = document.querySelector('section')
 
   log('Rendering...')
 
   // Remove any existing markup first
-  content.querySelectorAll('.account').forEach(el => {
-    content.removeChild(el)
+  section.querySelectorAll('.account').forEach(el => {
+    section.removeChild(el)
   })
 
   accounts.forEach(account => {
@@ -58,7 +57,7 @@ const renderAccounts = (user, accounts) => {
     el.appendChild(title)
     el.appendChild(meta)
     el.appendChild(balance)
-    content.appendChild(el)
+    section.appendChild(el)
   })
 }
 
@@ -69,7 +68,15 @@ const refresh = _ => {
 
 refresh()
 
-ipcRenderer.on('refresh', refresh)
+const realign = (_, windowBounds, trayBounds) => {
+  log('Realigning...')
+
+  const offset = trayBounds.x - windowBounds.x + (trayBounds.width / 2) - 10
+  const arrow = document.querySelector('.arrow')
+
+  arrow.style.left = `${offset}px`
+  arrow.style.display = 'block'
+}
 
 document.querySelector('footer a.website').addEventListener('click', e => {
   e.preventDefault()
@@ -79,3 +86,5 @@ document.querySelector('footer a.website').addEventListener('click', e => {
 document.querySelector('footer a.settings').addEventListener('click', e => {
   ipcRenderer.send('show-settings-menu')
 })
+
+ipcRenderer.on('show', realign)

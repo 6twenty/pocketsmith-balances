@@ -12,41 +12,39 @@ app.setName("PocketSmith Balances")
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
 
-  // Setup the menubar with an icon
   tray = new Tray(path.join(__dirname, 'IconTemplate.png'))
 
   tray.setHighlightMode('never')
 
-  // Add a click handler so that when the user clicks on the menubar icon, it shows
-  // our popup window
-  tray.on('click', function(event) {
-    toggleWindow()
+  tray.on('click', event => {
+    window.isVisible() ? hide() : show()
 
-    // Show devtools when command clicked
+    // Show devtools when ctrl clicked
     if (window.isVisible() && process.defaultApp && event.ctrlKey) {
       window.openDevTools({ mode: 'detach' })
     }
   })
 
-  // Make the popup window for the menubar
   window = new BrowserWindow({
     width: 300,
     height: 300,
     show: false,
     frame: false,
     resizable: false,
-    transparent: true,
-    shadow: false
+    hasShadow: false,
+    transparent: true
   })
 
-  // Tell the popup window to load our index.html file
   window.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 
-  // Only close the window on blur if dev tools isn't opened
   window.on('blur', _ => {
     tray.setHighlightMode('never')
-    if (!window.webContents.isDevToolsOpened()) {
-      window.hide()
+
+    const devToolsOpen = window.webContents.isDevToolsOpened()
+
+    // Only close the window on blur if dev tools isn't opened
+    if (!devToolsOpen) {
+      hide()
     }
   })
 
@@ -60,7 +58,6 @@ app.on('ready', _ => {
 
   window.on('show', _ => {
     tray.setHighlightMode('always')
-    window.webContents.send('refresh')
   })
 
   menu = Menu.buildFromTemplate([
@@ -70,15 +67,17 @@ app.on('ready', _ => {
   ])
 })
 
-const toggleWindow = _ => {
-  if (window.isVisible()) {
-    window.hide()
-  } else {
-    showWindow()
-  }
+const show = _ => {
+  positionWindow()
+  window.show()
+  window.focus()
 }
 
-const showWindow = _ => {
+const hide = _ => {
+  window.hide()
+}
+
+const positionWindow = _ => {
   const trayBounds = tray.getBounds()
   const windowBounds = window.getBounds()
 
@@ -86,8 +85,8 @@ const showWindow = _ => {
   let y = Math.round(trayBounds.y + trayBounds.height)
 
   window.setPosition(x, y, false)
-  window.show()
-  window.focus()
+
+  window.webContents.send('show', window.getBounds(), trayBounds)
 }
 
 const get = endpoint => {
@@ -98,8 +97,8 @@ const get = endpoint => {
   })
 }
 
-ipcMain.on('log', (event, message) => {
-  console.log(message)
+ipcMain.on('log', (event, ...args) => {
+  console.log(...args)
 })
 
 ipcMain.on('get', (event, endpoint) => {

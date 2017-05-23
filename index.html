@@ -1,10 +1,87 @@
 <!DOCTYPE html>
 
-<h1>Hello World!</h1>
+<style>
+  * {
+    -webkit-user-select: none;
+    box-sizing: inherit;
+  }
 
-<!-- All of the Node.js APIs are available in this renderer process. -->
-We are using Node.js <script>document.write(process.versions.node)</script>,
-Chromium <script>document.write(process.versions.chrome)</script>,
-and Electron <script>document.write(process.versions.electron)</script>.
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    box-sizing: border-box;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  main {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    left: 20px;
+    background: white;
+    width: auto;
+    border-radius: 5px;
+  }
+
+  main::after {
+    content: '';
+    display: block;
+    position: absolute;
+    font-size: 15px;
+    left: calc(50% - 1em);
+    top: -1em;
+    border: solid 1em transparent;
+    border-bottom-color: white;
+    border-top: none;
+  }
+
+  .content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 10px 20px;
+    width: auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .account {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .account .title {
+
+  }
+
+  .account .meta {
+    font-size: 12px;
+    float: left;
+  }
+
+  .account .balance {
+    font-size: 12px;
+    float: right;
+  }
+
+  .account::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+</style>
+
+<main>
+  <div class="content"></div>
+</main>
 
 <script src="renderer.js"></script>

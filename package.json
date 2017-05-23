@@ -20,7 +20,9 @@
     "electron": "~1.6.2"
   },
   "dependencies": {
+    "accounting-js": "^1.1.1",
     "got": "^6.7.1",
-    "menubar": "^5.2.3"
+    "menubar": "^5.2.3",
+    "moment": "^2.18.1"
   }
 }

@@ -58,6 +58,8 @@ app.on('ready', _ => {
 
   window.on('show', _ => {
     tray.setHighlightMode('always')
+
+    window.webContents.send('show', window.getBounds(), tray.getBounds())
   })
 
   menu = Menu.buildFromTemplate([
@@ -85,8 +87,6 @@ const positionWindow = _ => {
   let y = Math.round(trayBounds.y + trayBounds.height)
 
   window.setPosition(x, y, false)
-
-  window.webContents.send('show', window.getBounds(), trayBounds)
 }
 
 const get = endpoint => {

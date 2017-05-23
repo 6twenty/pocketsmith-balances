@@ -68,7 +68,7 @@ const refresh = _ => {
 
 refresh()
 
-const realign = (_, windowBounds, trayBounds) => {
+const handleShow = (_, windowBounds, trayBounds) => {
   log('Realigning...')
 
   const offset = trayBounds.x - windowBounds.x + (trayBounds.width / 2) - 10
@@ -87,4 +87,4 @@ document.querySelector('footer a.settings').addEventListener('click', e => {
   ipcRenderer.send('show-settings-menu')
 })
 
-ipcRenderer.on('show', realign)
+ipcRenderer.on('show', handleShow)

@@ -1,5 +1,5 @@
 // In renderer process (web page).
-const {ipcRenderer} = require('electron')
+const {ipcRenderer, shell} = require('electron')
 const accounting = require('accounting-js')
 const moment = require('moment')
 
@@ -70,3 +70,12 @@ const refresh = _ => {
 refresh()
 
 ipcRenderer.on('refresh', refresh)
+
+document.querySelector('footer a.website').addEventListener('click', e => {
+  e.preventDefault()
+  shell.openExternal(e.target.href)
+})
+
+document.querySelector('footer a.settings').addEventListener('click', e => {
+  ipcRenderer.send('show-settings-menu')
+})

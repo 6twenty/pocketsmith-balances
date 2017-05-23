@@ -1,20 +1,14 @@
 {
-  "name": "electron-quick-start",
+  "name": "pocketsmith-balances",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Menu bar app to display PocketSmith account balances",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
+  "repository": "https://github.com/6twenty/pocketsmith-balances",
+  "keywords": [],
+  "author": "Mike Fulcher",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2"
@@ -22,7 +16,6 @@
   "dependencies": {
     "accounting-js": "^1.1.1",
     "got": "^6.7.1",
-    "menubar": "^5.2.3",
     "moment": "^2.18.1"
   }
 }

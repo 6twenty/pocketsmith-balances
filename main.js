@@ -1,10 +1,13 @@
 const got = require('got')
 const path = require('path')
-const {app, BrowserWindow, ipcMain, Tray, nativeImage} = require('electron')
+const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu} = require('electron')
 const {apiKey} = require('./config')
 
 let tray
 let window
+let menu
+
+app.setName("PocketSmith Balances")
 
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
@@ -59,6 +62,12 @@ app.on('ready', _ => {
     tray.setHighlightMode('always')
     window.webContents.send('refresh')
   })
+
+  menu = Menu.buildFromTemplate([
+    {
+      role: 'quit'
+    }
+  ])
 })
 
 const toggleWindow = _ => {
@@ -101,14 +110,6 @@ ipcMain.on('get', (event, endpoint) => {
   })
 })
 
-ipcMain.on('resize', (event, {width, height}, animate) => {
-  const bounds = window.getBounds()
-  const offset = (width - bounds.width) / 2
-
-  window.setBounds({
-    width: width,
-    height: height,
-    x: bounds.x - offset,
-    y: bounds.y
-  }, animate)
+ipcMain.on('show-settings-menu', event => {
+  menu.popup(window)
 })

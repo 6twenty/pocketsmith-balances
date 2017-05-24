@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "accounting-js": "^1.1.1",
+    "electron-log": "^2.2.6",
     "got": "^6.7.1",
     "moment": "^2.18.1",
     "money": "^0.2.0"

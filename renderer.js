@@ -1,10 +1,7 @@
 const {ipcRenderer, shell} = require('electron')
 const accounting = require('accounting-js')
 const moment = require('moment')
-
-const log = (...args) => {
-  ipcRenderer.send('log', ...args)
-}
+const log = require('electron-log')
 
 const render = data => {
   const {user, accounts, netWorthEnabled} = data
@@ -12,7 +9,7 @@ const render = data => {
   const existing = main.querySelector('section')
   const section = document.createElement('section')
 
-  log('Rendering...')
+  log.debug('Rendering...')
 
   // Remove existing markup first
   if (existing) {
@@ -52,7 +49,7 @@ const render = data => {
 
   main.insertBefore(section, main.firstChild)
 
-  log(' > Done')
+  log.debug(' > Done')
 }
 
 const align = (windowBounds, trayBounds) => {

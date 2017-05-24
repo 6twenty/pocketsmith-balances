@@ -160,10 +160,6 @@ const refresh = force => {
   })
 }
 
-ipcMain.on('log', (event, ...args) => {
-  console.log(...args)
-})
-
 ipcMain.on('show-settings-menu', event => {
   const bounds = window.getBounds()
   const x = bounds.width / 2

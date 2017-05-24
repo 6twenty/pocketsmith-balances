@@ -1,6 +1,7 @@
 const got = require('got')
 const moment = require('moment')
 const money = require('money')
+const log = require('electron-log')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
@@ -27,18 +28,18 @@ exports.fetch = async force => {
     const oneHourAgo = moment().subtract(1, 'hour')
 
     if (!user) {
-      console.log('Fetching user...')
+      log.debug('Fetching user...')
 
       user = await get('me')
 
       storage.set('user', user)
 
-      console.log(' > Done')
+      log.debug(' > Done')
     }
 
     // Limit fetching to once per hour max
     if (!lastFetch || force || lastFetchTime.isBefore(oneHourAgo)) {
-      console.log('Fetching accounts...')
+      log.debug('Fetching accounts...')
 
       lastFetch = moment().format()
       accounts = await get(`users/${user.id}/accounts`)
@@ -73,7 +74,7 @@ exports.fetch = async force => {
 
       storage.set('user', user)
 
-      console.log(' > Done')
+      log.debug(' > Done')
 
       return Object.assign({}, storage.all(), { accounts: accounts })
     }
@@ -82,6 +83,6 @@ exports.fetch = async force => {
   } catch(e) {
     isFetching = false
 
-    console.log('Error fetching from API:', e)
+    log.debug('Error fetching from API:', e)
   }
 }

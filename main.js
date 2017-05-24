@@ -1,4 +1,3 @@
-const got = require('got')
 const path = require('path')
 const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu} = require('electron')
 const {apiKey} = require('./config')
@@ -89,24 +88,8 @@ const positionWindow = _ => {
   window.setPosition(x, y, false)
 }
 
-const get = endpoint => {
-  return got(`https://api.pocketsmith.com/v2/${endpoint}`, {
-    json: true, headers: { 'Authorization': `Key ${apiKey}` }
-  }).then(response => {
-    return response.body
-  })
-}
-
 ipcMain.on('log', (event, ...args) => {
   console.log(...args)
-})
-
-ipcMain.on('get', (event, endpoint) => {
-  get(endpoint).then(json => {
-    event.sender.send('get-success', json)
-  }).catch(error => {
-    event.sender.send('get-fail', error)
-  })
 })
 
 ipcMain.on('show-settings-menu', event => {

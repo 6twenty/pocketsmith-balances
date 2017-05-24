@@ -1,5 +1,4 @@
-// In renderer process (web page).
-const {ipcRenderer, shell} = require('electron')
+const {ipcRenderer, shell, remote} = require('electron')
 const accounting = require('accounting-js')
 const moment = require('moment')
 
@@ -7,24 +6,8 @@ const log = (...args) => {
   ipcRenderer.send('log', ...args)
 }
 
-const get = endpoint => {
-  const channelSuccess = `get-success`
-  const channelFail = `get-fail`
-
-  const done = _ => {
-    ipcRenderer.removeAllListeners(channelSuccess)
-    ipcRenderer.removeAllListeners(channelFail)
-    return true
-  }
-
-  return new Promise((resolve, reject) => {
-    ipcRenderer.once(channelSuccess, (event, data) => done() && resolve(data))
-    ipcRenderer.once(channelFail, (event, error) => done() && reject(error))
-    ipcRenderer.send('get', endpoint)
-  })
-}
-
-const renderAccounts = (user, accounts) => {
+const render = data => {
+  const {user, accounts} = data
   const section = document.querySelector('section')
 
   log('Rendering...')
@@ -61,21 +44,20 @@ const renderAccounts = (user, accounts) => {
   })
 }
 
-const refresh = _ => {
-  log('Refreshing...')
-  get('me').then(json => get(`users/${json.id}/accounts`).then(renderAccounts.bind(this, json)))
-}
-
-refresh()
-
-const handleShow = (_, windowBounds, trayBounds) => {
-  log('Realigning...')
-
+const align = (windowBounds, trayBounds) => {
   const offset = trayBounds.x - windowBounds.x + (trayBounds.width / 2) - 10
   const arrow = document.querySelector('.arrow')
 
+  log('Realigning...')
+
   arrow.style.left = `${offset}px`
   arrow.style.display = 'block'
+}
+
+const handleShow = (_, windowBounds, trayBounds) => {
+  align(windowBounds, trayBounds)
+
+  remote.require('./api').fetch().then(render)
 }
 
 document.querySelector('footer a.website').addEventListener('click', e => {

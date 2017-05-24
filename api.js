@@ -51,7 +51,7 @@ exports.fetch = async force => {
 
       isFetching = false
 
-      return Object.assign(storage.all(), { accounts: accounts })
+      return Object.assign({}, storage.all(), { accounts: accounts })
     }
 
     isFetching = false

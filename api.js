@@ -26,14 +26,14 @@ exports.fetch = async force => {
     const lastFetchTime = lastFetch ? moment(lastFetch) : null
     const oneHourAgo = moment().subtract(1, 'hour')
 
-    console.log('Fetching...')
-
     if (!user) {
       console.log('Fetching user...')
 
       user = await get('me')
 
       storage.set('user', user)
+
+      console.log(' > Done')
     }
 
     // Limit fetching to once per hour max
@@ -72,6 +72,8 @@ exports.fetch = async force => {
       }
 
       storage.set('user', user)
+
+      console.log(' > Done')
 
       return Object.assign({}, storage.all(), { accounts: accounts })
     }

@@ -50,14 +50,14 @@ const render = data => {
     section.appendChild(el)
   })
 
-  main.insertBefore(section, main.firstChild);
+  main.insertBefore(section, main.firstChild)
+
+  log(' > Done')
 }
 
 const align = (windowBounds, trayBounds) => {
   const offset = trayBounds.x - windowBounds.x + (trayBounds.width / 2) - 10
   const arrow = document.querySelector('.arrow')
-
-  log('Realigning...')
 
   arrow.style.left = `${offset}px`
   arrow.style.display = 'block'

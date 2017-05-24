@@ -70,8 +70,14 @@ app.on('ready', _ => {
   const menuTemplate = [
     { type: 'separator' },
     {
+      label: 'Sync now',
+      click: (menuItem, browserWindow, event) => {
+        window.webContents.send('refresh')
+      }
+    },
+    {
       type: 'checkbox',
-      label: 'Include Net Worth assets',
+      label: 'Show Net Worth assets',
       checked: storage.get('netWorthEnabled'),
       click: (menuItem, browserWindow, event) => {
         window.webContents.send('toggle-net-worth', menuItem.checked)
@@ -86,7 +92,7 @@ app.on('ready', _ => {
 
   if (user) {
     menuTemplate.unshift({
-      label: user.login,
+      label: `Connected as ${user.login}`,
       enabled: false
     })
   }
@@ -120,8 +126,8 @@ ipcMain.on('log', (event, ...args) => {
 
 ipcMain.on('show-settings-menu', event => {
   const bounds = window.getBounds()
-  const x = bounds.x + bounds.width - 70
-  const y = bounds.y + bounds.height - 35
+  const x = bounds.width / 2
+  const y = bounds.height - 20
 
   menu.popup(window, { x: x, y: y })
 })
@@ -132,7 +138,7 @@ ipcMain.once('fetched', (event, data) => {
   }
 
   const menuItem = new MenuItem({
-    label: data.user.login,
+    label: `Connected as ${data.user.login}`,
     enabled: false
   })
 

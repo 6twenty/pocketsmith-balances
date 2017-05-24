@@ -84,7 +84,11 @@ const align = (windowBounds, trayBounds) => {
 const handleShow = (_, windowBounds, trayBounds) => {
   align(windowBounds, trayBounds)
 
-  fetch.then(render)
+  refresh()
+}
+
+const refresh = _ => {
+  fetch().then(render)
 }
 
 const toggleNetWorth = (_, enabled) => {
@@ -105,6 +109,7 @@ document.querySelector('footer a.settings').addEventListener('click', e => {
 })
 
 ipcRenderer.on('show', handleShow)
+ipcRenderer.on('refresh', refresh)
 ipcRenderer.on('toggle-net-worth', toggleNetWorth)
 
-fetch().then(render)
+refresh()

@@ -4,6 +4,10 @@ const api = require('./api')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
+if (!storage.has('netWorthEnabled')) {
+  storage.set('netWorthEnabled', true)
+}
+
 let user = storage.get('user')
 let tray
 let window
@@ -14,6 +18,12 @@ app.setName("PocketSmith Balances")
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
 
+  buildTray()
+  buildWindow()
+  buildMenu()
+})
+
+const buildTray = _ => {
   tray = new Tray(path.join(__dirname, 'IconTemplate.png'))
 
   tray.setHighlightMode('never')
@@ -26,7 +36,9 @@ app.on('ready', _ => {
       window.openDevTools({ mode: 'detach' })
     }
   })
+}
 
+const buildWindow = _ => {
   window = new BrowserWindow({
     width: 300,
     height: 300,
@@ -69,12 +81,14 @@ app.on('ready', _ => {
 
     refresh()
   })
+}
 
-  if (!storage.has('netWorthEnabled')) {
-    storage.set('netWorthEnabled', true)
-  }
-
-  const menuTemplate = [
+const buildMenu = _ => {
+  menu = Menu.buildFromTemplate([
+    {
+      label: user ? `Connected as ${user.login}` : 'Connecting...',
+      enabled: false
+    },
     { type: 'separator' },
     {
       label: 'Sync now',
@@ -95,17 +109,8 @@ app.on('ready', _ => {
     {
       role: 'quit'
     }
-  ]
-
-  if (user) {
-    menuTemplate.unshift({
-      label: `Connected as ${user.login}`,
-      enabled: false
-    })
-  }
-
-  menu = Menu.buildFromTemplate(menuTemplate)
-})
+  ])
+}
 
 const show = _ => {
   positionWindow()
@@ -132,6 +137,11 @@ const refresh = force => {
 
   api.fetch(force).then(data => {
     window.webContents.send('did-refresh', data)
+
+    if (!user && data.user) {
+      user = data.user
+      buildMenu()
+    }
   })
 }
 
@@ -145,17 +155,4 @@ ipcMain.on('show-settings-menu', event => {
   const y = bounds.height - 20
 
   menu.popup(window, { x: x, y: y })
-})
-
-ipcMain.once('fetched', (event, data) => {
-  if (user) {
-    return
-  }
-
-  const menuItem = new MenuItem({
-    label: `Connected as ${data.user.login}`,
-    enabled: false
-  })
-
-  menu.insert(0, menuItem)
 })

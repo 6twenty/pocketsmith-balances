@@ -60,10 +60,14 @@ const fetch = force => {
     return
   }
 
+  document.body.classList.add('syncing')
+
   isFetching = true
 
   return remote.require('./api').fetch(force).then(data => {
     isFetching = false
+
+    document.body.classList.remove('syncing')
 
     ipcRenderer.send('fetched', data)
 

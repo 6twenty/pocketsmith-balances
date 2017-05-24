@@ -8,14 +8,16 @@ const log = (...args) => {
 
 const render = data => {
   const {user, accounts} = data
-  const section = document.querySelector('section')
+  const main = document.querySelector('main')
+  const existing = main.querySelector('section')
+  const section = document.createElement('section')
 
   log('Rendering...')
 
-  // Remove any existing markup first
-  section.querySelectorAll('.account').forEach(el => {
-    section.removeChild(el)
-  })
+  // Remove existing markup first
+  if (existing) {
+    main.removeChild(existing)
+  }
 
   accounts.forEach(account => {
     const el = document.createElement('div')
@@ -42,6 +44,8 @@ const render = data => {
     el.appendChild(balance)
     section.appendChild(el)
   })
+
+  main.insertBefore(section, main.firstChild);
 }
 
 const align = (windowBounds, trayBounds) => {

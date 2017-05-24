@@ -1,13 +1,13 @@
 {
-  "name": "pocketsmith-balances",
-  "productName": "PocketSmith Balances",
+  "name": "pocketsmith-mini",
+  "productName": "PocketSmith Mini",
   "version": "1.0.0",
-  "description": "Menu bar app to display PocketSmith account balances",
+  "description": "PocketSmith menu bar app",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/6twenty/pocketsmith-balances",
+  "repository": "https://github.com/6twenty/pocketsmith-mini",
   "keywords": [],
   "author": "Mike Fulcher",
   "license": "CC0-1.0",

@@ -1,4 +1,4 @@
-# PocketSmith Balances
+# PocketSmith Mini
 
 A macOS menubar app.
 

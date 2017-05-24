@@ -11,7 +11,7 @@ const get = endpoint => {
   })
 }
 
-exports.fetch = async _ => {
+exports.fetch = async force => {
   let user = storage.get('user')
   let accounts = storage.get('accounts')
   let lastFetch = storage.get('lastFetch')
@@ -30,7 +30,7 @@ exports.fetch = async _ => {
   }
 
   // Limit fetching to once per hour max
-  if (!accounts || lastFetchTime.isBefore(oneHourAgo)) {
+  if (!accounts || force || lastFetchTime.isBefore(oneHourAgo)) {
     console.log('Fetching accounts...')
 
     lastFetch = moment().format()

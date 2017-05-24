@@ -72,7 +72,7 @@ app.on('ready', _ => {
     {
       label: 'Sync now',
       click: (menuItem, browserWindow, event) => {
-        window.webContents.send('refresh')
+        window.webContents.send('refresh', true)
       }
     },
     {

@@ -55,14 +55,14 @@ const render = data => {
 
 let isFetching = false
 
-const fetch = _ => {
+const fetch = force => {
   if (isFetching) {
     return
   }
 
   isFetching = true
 
-  return remote.require('./api').fetch().then(data => {
+  return remote.require('./api').fetch(force).then(data => {
     isFetching = false
 
     ipcRenderer.send('fetched', data)
@@ -87,8 +87,8 @@ const handleShow = (_, windowBounds, trayBounds) => {
   refresh()
 }
 
-const refresh = _ => {
-  fetch().then(render)
+const refresh = (_, force) => {
+  fetch(force).then(render)
 }
 
 const toggleNetWorth = (_, enabled) => {

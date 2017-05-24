@@ -1,5 +1,6 @@
 {
   "name": "pocketsmith-balances",
+  "productName": "PocketSmith Balances",
   "version": "1.0.0",
   "description": "Menu bar app to display PocketSmith account balances",
   "main": "main.js",

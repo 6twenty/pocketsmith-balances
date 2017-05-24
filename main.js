@@ -9,8 +9,6 @@ let tray
 let window
 let menu
 
-app.setName("PocketSmith Balances")
-
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
 

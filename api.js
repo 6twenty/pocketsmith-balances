@@ -3,9 +3,6 @@ const moment = require('moment')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
-// Cleanup legacy data
-storage.del('accounts')
-
 let isFetching = false
 
 const get = endpoint => {

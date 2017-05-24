@@ -3,6 +3,11 @@ const moment = require('moment')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
+// Cleanup legacy data
+storage.del('accounts')
+
+let isFetching = false
+
 const get = endpoint => {
   return got(`https://api.pocketsmith.com/v2/${endpoint}`, {
     json: true, headers: { 'Authorization': `Key ${apiKey}` }
@@ -12,33 +17,47 @@ const get = endpoint => {
 }
 
 exports.fetch = async force => {
-  let user = storage.get('user')
-  let accounts = storage.get('accounts')
-  let lastFetch = storage.get('lastFetch')
+  try {
+    if (isFetching) {
+      return
+    }
 
-  const lastFetchTime = lastFetch ? moment(lastFetch) : null
-  const oneHourAgo = moment().subtract(1, 'hour')
+    isFetching = true
 
-  console.log('Fetching...')
+    let user = storage.get('user')
+    let lastFetch = storage.get('lastFetch')
 
-  if (!user) {
-    console.log('Fetching user...')
+    const lastFetchTime = lastFetch ? moment(lastFetch) : null
+    const oneHourAgo = moment().subtract(1, 'hour')
 
-    user = await get('me')
+    console.log('Fetching...')
 
-    storage.set('user', user)
+    if (!user) {
+      console.log('Fetching user...')
+
+      user = await get('me')
+
+      storage.set('user', user)
+    }
+
+    // Limit fetching to once per hour max
+    if (!lastFetch || force || lastFetchTime.isBefore(oneHourAgo)) {
+      console.log('Fetching accounts...')
+
+      lastFetch = moment().format()
+      accounts = await get(`users/${user.id}/accounts`)
+
+      storage.set('lastFetch', lastFetch)
+
+      isFetching = false
+
+      return Object.assign(storage.all(), { accounts: accounts })
+    }
+
+    isFetching = false
+  } catch(e) {
+    isFetching = false
+
+    console.log('Error fetching from API:', e)
   }
-
-  // Limit fetching to once per hour max
-  if (!accounts || force || lastFetchTime.isBefore(oneHourAgo)) {
-    console.log('Fetching accounts...')
-
-    lastFetch = moment().format()
-    accounts = await get(`users/${user.id}/accounts`)
-
-    storage.set('lastFetch', lastFetch)
-    storage.set('accounts', accounts)
-  }
-
-  return storage.all()
 }

@@ -1,4 +1,4 @@
-const {ipcRenderer, shell, remote} = require('electron')
+const {ipcRenderer, shell} = require('electron')
 const accounting = require('accounting-js')
 const moment = require('moment')
 
@@ -53,28 +53,6 @@ const render = data => {
   main.insertBefore(section, main.firstChild);
 }
 
-let isFetching = false
-
-const fetch = force => {
-  if (isFetching) {
-    return
-  }
-
-  document.body.classList.add('syncing')
-
-  isFetching = true
-
-  return remote.require('./api').fetch(force).then(data => {
-    isFetching = false
-
-    document.body.classList.remove('syncing')
-
-    ipcRenderer.send('fetched', data)
-
-    return data
-  })
-}
-
 const align = (windowBounds, trayBounds) => {
   const offset = trayBounds.x - windowBounds.x + (trayBounds.width / 2) - 10
   const arrow = document.querySelector('.arrow')
@@ -87,12 +65,18 @@ const align = (windowBounds, trayBounds) => {
 
 const handleShow = (_, windowBounds, trayBounds) => {
   align(windowBounds, trayBounds)
-
-  refresh()
 }
 
-const refresh = (_, force) => {
-  fetch(force).then(render)
+const willRefresh = _ => {
+  document.body.classList.add('syncing')
+}
+
+const didRefresh = (_, data) => {
+  document.body.classList.remove('syncing')
+
+  if (data) {
+    render(data)
+  }
 }
 
 const toggleNetWorth = (_, enabled) => {
@@ -113,7 +97,6 @@ document.querySelector('footer a.settings').addEventListener('click', e => {
 })
 
 ipcRenderer.on('show', handleShow)
-ipcRenderer.on('refresh', refresh)
+ipcRenderer.on('will-refresh', willRefresh)
+ipcRenderer.on('did-refresh', didRefresh)
 ipcRenderer.on('toggle-net-worth', toggleNetWorth)
-
-refresh()

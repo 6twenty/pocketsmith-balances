@@ -1,5 +1,6 @@
 const path = require('path')
 const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu, MenuItem} = require('electron')
+const api = require('./api')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
@@ -38,6 +39,10 @@ app.on('ready', _ => {
 
   window.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 
+  window.on('ready-to-show', _ => {
+    refresh(true)
+  })
+
   window.on('blur', _ => {
     tray.setHighlightMode('never')
 
@@ -61,6 +66,8 @@ app.on('ready', _ => {
     tray.setHighlightMode('always')
 
     window.webContents.send('show', window.getBounds(), tray.getBounds())
+
+    refresh()
   })
 
   if (!storage.has('netWorthEnabled')) {
@@ -72,7 +79,7 @@ app.on('ready', _ => {
     {
       label: 'Sync now',
       click: (menuItem, browserWindow, event) => {
-        window.webContents.send('refresh', true)
+        refresh(true)
       }
     },
     {
@@ -118,6 +125,14 @@ const positionWindow = _ => {
   let y = Math.round(trayBounds.y + trayBounds.height)
 
   window.setPosition(x, y, false)
+}
+
+const refresh = force => {
+  window.webContents.send('will-refresh')
+
+  api.fetch(force).then(data => {
+    window.webContents.send('did-refresh', data)
+  })
 }
 
 ipcMain.on('log', (event, ...args) => {

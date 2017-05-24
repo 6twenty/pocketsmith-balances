@@ -56,9 +56,14 @@ exports.fetch = async force => {
         money.rates[data.base] = 1
 
         user.net_worth = accounts.reduce((sum, account) => {
-          return sum + money(account.current_balance)
-            .from(account.currency_code.toUpperCase())
-            .to(user.base_currency_code.toUpperCase())
+          try {
+            return sum + money(account.current_balance)
+              .from(account.currency_code.toUpperCase())
+              .to(user.base_currency_code.toUpperCase())
+          } catch (e) {
+            // Er, just skip this account I guess
+            return sum
+          }
         }, 0)
       } else {
         user.net_worth = accounts.reduce((sum, account) => {

@@ -4,10 +4,6 @@ const api = require('./api')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
-if (!storage.has('netWorthEnabled')) {
-  storage.set('netWorthEnabled', true)
-}
-
 let user = storage.get('user')
 let tray
 let window
@@ -17,6 +13,10 @@ app.setName("PocketSmith Balances")
 
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
+
+  if (!storage.has('netWorthEnabled')) {
+    storage.set('netWorthEnabled', true)
+  }
 
   buildTray()
   buildWindow()

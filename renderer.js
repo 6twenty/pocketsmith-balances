@@ -7,7 +7,7 @@ const log = (...args) => {
 }
 
 const render = data => {
-  const {user, accounts} = data
+  const {user, accounts, netWorthEnabled} = data
   const main = document.querySelector('main')
   const existing = main.querySelector('section')
   const section = document.createElement('section')
@@ -36,6 +36,10 @@ const render = data => {
     meta.classList.add('meta')
     balance.classList.add('balance')
 
+    if (!netWorthEnabled && account.is_net_worth) {
+      el.style.display = 'none'
+    }
+
     title.appendChild(document.createTextNode(account.title))
     meta.appendChild(document.createTextNode(date))
     balance.appendChild(document.createTextNode(amount))
@@ -47,6 +51,24 @@ const render = data => {
   })
 
   main.insertBefore(section, main.firstChild);
+}
+
+let isFetching = false
+
+const fetch = _ => {
+  if (isFetching) {
+    return
+  }
+
+  isFetching = true
+
+  return remote.require('./api').fetch().then(data => {
+    isFetching = false
+
+    ipcRenderer.send('fetched', data)
+
+    return data
+  })
 }
 
 const align = (windowBounds, trayBounds) => {
@@ -62,7 +84,15 @@ const align = (windowBounds, trayBounds) => {
 const handleShow = (_, windowBounds, trayBounds) => {
   align(windowBounds, trayBounds)
 
-  remote.require('./api').fetch().then(render)
+  fetch.then(render)
+}
+
+const toggleNetWorth = (_, enabled) => {
+  document.querySelectorAll('.account').forEach(el => {
+    if (el.dataset.networth === '1') {
+      el.style.display = enabled ? 'block' : 'none'
+    }
+  })
 }
 
 document.querySelector('footer a.website').addEventListener('click', e => {
@@ -75,3 +105,6 @@ document.querySelector('footer a.settings').addEventListener('click', e => {
 })
 
 ipcRenderer.on('show', handleShow)
+ipcRenderer.on('toggle-net-worth', toggleNetWorth)
+
+fetch().then(render)

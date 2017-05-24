@@ -1,9 +1,7 @@
 const got = require('got')
 const moment = require('moment')
-const crypto = require('crypto')
-const storage = require('./storage')
 const {apiKey} = require('./config')
-const hashedKey = crypto.createHash('sha256').update(apiKey).digest('hex')
+const storage = require('./storage')(apiKey)
 
 const get = endpoint => {
   return got(`https://api.pocketsmith.com/v2/${endpoint}`, {
@@ -14,28 +12,33 @@ const get = endpoint => {
 }
 
 exports.fetch = async _ => {
-  const store = storage.get(hashedKey) || {}
-  const lastFetch = store.lastFetch ? moment(store.lastFetch) : null
-  const hourAgo = moment().subtract(1, 'hour')
+  let user = storage.get('user')
+  let accounts = storage.get('accounts')
+  let lastFetch = storage.get('lastFetch')
+
+  const lastFetchTime = lastFetch ? moment(lastFetch) : null
+  const oneHourAgo = moment().subtract(1, 'hour')
 
   console.log('Fetching...')
 
-  if (!store.user) {
+  if (!user) {
     console.log('Fetching user...')
-    store.user = await get('me')
-    storage.set(hashedKey, store)
+
+    user = await get('me')
+
+    storage.set('user', user)
   }
 
   // Limit fetching to once per hour max
-  if (!store.accounts || lastFetch.isBefore(hourAgo)) {
+  if (!accounts || lastFetchTime.isBefore(oneHourAgo)) {
     console.log('Fetching accounts...')
-    store.lastFetch = moment().format()
-    store.accounts = await get(`users/${store.user.id}/accounts`)
-    storage.set(hashedKey, store)
+
+    lastFetch = moment().format()
+    accounts = await get(`users/${user.id}/accounts`)
+
+    storage.set('lastFetch', lastFetch)
+    storage.set('accounts', accounts)
   }
 
-  return {
-    user: store.user,
-    accounts: store.accounts
-  }
+  return storage.all()
 }

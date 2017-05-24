@@ -1,7 +1,9 @@
 const path = require('path')
-const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu} = require('electron')
+const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu, MenuItem} = require('electron')
 const {apiKey} = require('./config')
+const storage = require('./storage')(apiKey)
 
+let user = storage.get('user')
 let tray
 let window
 let menu
@@ -61,11 +63,35 @@ app.on('ready', _ => {
     window.webContents.send('show', window.getBounds(), tray.getBounds())
   })
 
-  menu = Menu.buildFromTemplate([
+  if (!storage.has('netWorthEnabled')) {
+    storage.set('netWorthEnabled', true)
+  }
+
+  const menuTemplate = [
+    { type: 'separator' },
+    {
+      type: 'checkbox',
+      label: 'Include Net Worth assets',
+      checked: storage.get('netWorthEnabled'),
+      click: (menuItem, browserWindow, event) => {
+        window.webContents.send('toggle-net-worth', menuItem.checked)
+        storage.set('netWorthEnabled', menuItem.checked)
+      }
+    },
+    { type: 'separator' },
     {
       role: 'quit'
     }
-  ])
+  ]
+
+  if (user) {
+    menuTemplate.unshift({
+      label: user.login,
+      enabled: false
+    })
+  }
+
+  menu = Menu.buildFromTemplate(menuTemplate)
 })
 
 const show = _ => {
@@ -93,5 +119,22 @@ ipcMain.on('log', (event, ...args) => {
 })
 
 ipcMain.on('show-settings-menu', event => {
-  menu.popup(window)
+  const bounds = window.getBounds()
+  const x = bounds.x + bounds.width - 70
+  const y = bounds.y + bounds.height - 35
+
+  menu.popup(window, { x: x, y: y })
+})
+
+ipcMain.once('fetched', (event, data) => {
+  if (user) {
+    return
+  }
+
+  const menuItem = new MenuItem({
+    label: data.user.login,
+    enabled: false
+  })
+
+  menu.insert(0, menuItem)
 })

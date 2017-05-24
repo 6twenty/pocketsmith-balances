@@ -1,5 +1,6 @@
 const got = require('got')
 const moment = require('moment')
+const money = require('money')
 const {apiKey} = require('./config')
 const storage = require('./storage')(apiKey)
 
@@ -8,9 +9,7 @@ let isFetching = false
 const get = endpoint => {
   return got(`https://api.pocketsmith.com/v2/${endpoint}`, {
     json: true, headers: { 'Authorization': `Key ${apiKey}` }
-  }).then(response => {
-    return response.body
-  })
+  }).then(response => response.body)
 }
 
 exports.fetch = async force => {
@@ -47,6 +46,27 @@ exports.fetch = async force => {
       storage.set('lastFetch', lastFetch)
 
       isFetching = false
+
+      if (user.using_multiple_currencies) {
+        const currencies = accounts.map(account => account.currency_code.toUpperCase())
+        const url = `https://api.fixer.io/latest?symbols=${currencies.join(',')}`
+        const data = await got(url, { json: true }).then(response => response.body)
+
+        money.rates = data.rates
+        money.rates[data.base] = 1
+
+        user.net_worth = accounts.reduce((sum, account) => {
+          return sum + money(account.current_balance)
+            .from(account.currency_code.toUpperCase())
+            .to(user.base_currency_code.toUpperCase())
+        }, 0)
+      } else {
+        user.net_worth = accounts.reduce((sum, account) => {
+          return sum + account.current_balance
+        }, 0)
+      }
+
+      storage.set('user', user)
 
       return Object.assign({}, storage.all(), { accounts: accounts })
     }

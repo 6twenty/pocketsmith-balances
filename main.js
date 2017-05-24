@@ -1,4 +1,5 @@
 const path = require('path')
+const accounting = require('accounting-js')
 const {app, BrowserWindow, ipcMain, Tray, nativeImage, Menu, MenuItem} = require('electron')
 const api = require('./api')
 const {apiKey} = require('./config')
@@ -82,9 +83,22 @@ const buildWindow = _ => {
 }
 
 const buildMenu = _ => {
+  let netWorth
+
+  if (user && user.net_worth) {
+     netWorth = accounting.formatMoney(user.net_worth, {
+      symbol: user.base_currency_code,
+      format: user.using_multiple_currencies ? "%v %s" : "%v"
+    })
+  }
+
   menu = Menu.buildFromTemplate([
     {
       label: user ? `Connected as ${user.login}` : 'Connecting...',
+      enabled: false
+    },
+    {
+      label: netWorth ? `Net Worth: ${netWorth}` : '-',
       enabled: false
     },
     { type: 'separator' },
@@ -136,9 +150,12 @@ const refresh = force => {
   api.fetch(force).then(data => {
     window.webContents.send('did-refresh', data)
 
-    if (!user && data.user) {
-      user = data.user
-      buildMenu()
+    // If receiving an updated user, rebuild the menu
+    if (data && data.user) {
+      if (!user || user.net_worth != data.user.net_worth) {
+        user = data.user
+        buildMenu()
+      }
     }
   })
 }

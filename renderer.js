@@ -30,6 +30,7 @@ const render = data => {
       format: user.using_multiple_currencies ? "%v %s" : "%v"
     })
 
+    el.dataset.networth = account.is_net_worth ? 1 : 0
     el.classList.add('account')
     title.classList.add('title')
     meta.classList.add('meta')

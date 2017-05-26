@@ -9,6 +9,8 @@ const render = data => {
   const existing = main.querySelector('section')
   const section = document.createElement('section')
 
+  toggleNetWorth(null, netWorthEnabled)
+
   log.debug('Rendering...')
 
   // Remove existing markup first
@@ -32,10 +34,6 @@ const render = data => {
     title.classList.add('title')
     meta.classList.add('meta')
     balance.classList.add('balance')
-
-    if (!netWorthEnabled && account.is_net_worth) {
-      el.style.display = 'none'
-    }
 
     title.appendChild(document.createTextNode(account.title))
     meta.appendChild(document.createTextNode(date))
@@ -77,11 +75,7 @@ const didRefresh = (_, data) => {
 }
 
 const toggleNetWorth = (_, enabled) => {
-  document.querySelectorAll('.account').forEach(el => {
-    if (el.dataset.networth === '1') {
-      el.style.display = enabled ? 'block' : 'none'
-    }
-  })
+  document.body.dataset.networth = enabled ? '1' : '0'
 }
 
 document.querySelector('footer a.website').addEventListener('click', e => {

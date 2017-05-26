@@ -103,14 +103,14 @@ const buildMenu = _ => {
     },
     { type: 'separator' },
     {
-      label: 'Sync now',
+      label: 'Sync Now',
       click: (menuItem, browserWindow, event) => {
         refresh(true)
       }
     },
     {
       type: 'checkbox',
-      label: 'Show Net Worth assets',
+      label: 'Show Net Worth Assets',
       checked: storage.get('netWorthEnabled'),
       click: (menuItem, browserWindow, event) => {
         window.webContents.send('toggle-net-worth', menuItem.checked)

@@ -83,6 +83,6 @@ exports.fetch = async force => {
   } catch(e) {
     isFetching = false
 
-    log.debug('Error fetching from API:', e)
+    log.error('Error fetching from API:', e)
   }
 }

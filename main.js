@@ -10,6 +10,14 @@ let tray
 let window
 let menu
 
+const shouldQuit = app.makeSingleInstance((argv, workingDirectory) => {
+  // Could focus the app window here
+})
+
+if (shouldQuit) {
+  app.quit()
+}
+
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
 

@@ -5,14 +5,16 @@
   "description": "PocketSmith menu bar app",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "electron-packager ./ 'PocketSmith Mini' --out=./packages/ --overwrite"
   },
   "repository": "https://github.com/6twenty/pocketsmith-mini",
   "keywords": [],
   "author": "Mike Fulcher",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^1.6.10"
+    "electron": "^1.6.10",
+    "electron-packager": "^8.7.0"
   },
   "dependencies": {
     "accounting-js": "^1.1.1",

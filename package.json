@@ -12,7 +12,7 @@
   "author": "Mike Fulcher",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^1.6.8"
+    "electron": "^1.6.10"
   },
   "dependencies": {
     "accounting-js": "^1.1.1",

@@ -18,6 +18,8 @@ if (shouldQuit) {
   app.quit()
 }
 
+const loginSettings = app.getLoginItemSettings()
+
 app.on('ready', _ => {
   if (app.dock) app.dock.hide()
 
@@ -123,6 +125,17 @@ const buildMenu = _ => {
       click: (menuItem, browserWindow, event) => {
         window.webContents.send('toggle-net-worth', menuItem.checked)
         storage.set('netWorthEnabled', menuItem.checked)
+      }
+    },
+    {
+      type: 'checkbox',
+      label: 'Start On Login',
+      checked: loginSettings.openAtLogin,
+      click: (menuItem, browserWindow, event) => {
+        app.setLoginItemSettings({
+          openAtLogin: menuItem.checked,
+          openAsHidden: menuItem.checked
+        })
       }
     },
     { type: 'separator' },
